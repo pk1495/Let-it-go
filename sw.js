@@ -1,20 +1,450 @@
-const CACHE = 'let-it-go-v1';
-const ASSETS = ['./index.html', './manifest.json', './icon.png'];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let It Go ✦</title>
+<meta name="description" content="A meadow for your mind — release what weighs on you.">
+<meta name="theme-color" content="#4a7c3f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Let It Go">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Lora', serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+  }
+  #bg {
+    position: fixed;
+    inset: 0;
+    background-image: url('icon.png');
+    background-size: cover;
+    background-position: center 30%;
+    filter: brightness(0.88) saturate(1.15);
+    z-index: 0;
+  }
+  #bg-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(20,10,5,0.08) 0%, rgba(0,0,0,0.05) 50%, rgba(20,35,5,0.25) 100%);
+    z-index: 1;
+  }
+  #canvas-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 20;
+    overflow: hidden;
+  }
+  #scene {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 1rem;
+  }
+  #tagline {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: rgba(255,255,240,0.82);
+    letter-spacing: 0.08em;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+    animation: fadeUp 1.2s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  #title {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 46px;
+    color: #fff8e8;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.45), 0 0 40px rgba(255,200,100,0.2);
+    letter-spacing: 0.04em;
+    margin-bottom: 24px;
+    animation: fadeUp 1s ease 0.1s both;
+  }
+  #sticky-wrap {
+    animation: fadeUp 1s ease 0.25s both;
+    filter: drop-shadow(0 8px 32px rgba(0,0,0,0.35)) drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+  }
+  #sticky {
+    width: 320px;
+    height: 300px;
+    background: #fef08a;
+    position: relative;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    transform-origin: center center;
+    transition: transform 0.3s ease;
+  }
+  #sticky::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 28px; height: 28px;
+    background: linear-gradient(225deg, #d4b800 50%, #fef08a 50%);
+  }
+  #sticky-top {
+    width: 100%;
+    height: 32px;
+    background: #fde047;
+    flex-shrink: 0;
+    border-radius: 2px 2px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #sticky-label {
+    font-family: 'Caveat', cursive;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(100,75,0,0.55);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  #sticky-body {
+    flex: 1;
+    position: relative;
+    padding: 10px 14px 20px 14px;
+    overflow: hidden;
+  }
+  .sticky-line {
+    position: absolute;
+    left: 14px; right: 14px;
+    height: 1px;
+    background: rgba(160,130,0,0.18);
+  }
+  #note-input {
+    position: absolute;
+    inset: 8px 14px 18px 14px;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: 'Caveat', cursive;
+    font-size: 19px;
+    font-weight: 400;
+    color: #3a2e00;
+    line-height: 26px;
+    padding: 0;
+    z-index: 2;
+    overflow: hidden;
+  }
+  #note-input::placeholder {
+    color: rgba(120,95,0,0.32);
+    font-style: italic;
+  }
+  #btn-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    animation: fadeUp 1s ease 0.4s both;
+  }
+  #release-btn {
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: #fff;
+    border: none;
+    border-radius: 40px;
+    padding: 11px 38px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    box-shadow: 0 4px 20px rgba(249,115,22,0.5), 0 1px 4px rgba(0,0,0,0.2);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  #release-btn:hover { transform: scale(1.05) translateY(-1px); box-shadow: 0 6px 28px rgba(249,115,22,0.6); }
+  #release-btn:active { transform: scale(0.97); }
+  #release-btn:disabled { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
+  #clear-btn {
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: rgba(255,255,240,0.7);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.15s;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    text-decoration: underline;
+    text-decoration-color: rgba(255,255,240,0.3);
+    text-underline-offset: 3px;
+  }
+  #clear-btn:hover { color: rgba(255,255,240,0.95); }
+  #hint {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: rgba(255,255,230,0.65);
+    margin-top: 8px;
+    min-height: 20px;
+    text-align: center;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    transition: opacity 0.4s;
+    animation: fadeUp 1s ease 0.5s both;
+  }
+  #count-display {
+    font-family: 'Caveat', cursive;
+    font-size: 16px;
+    color: rgba(255,255,220,0.6);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    margin-top: 6px;
+    min-height: 22px;
+    letter-spacing: 0.05em;
+    animation: fadeUp 1s ease 0.6s both;
+    text-align: center;
+  }
+  #install-banner {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,248,220,0.92);
+    border: 1px solid rgba(200,170,0,0.3);
+    border-radius: 16px;
+    padding: 10px 20px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    z-index: 50;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    color: #3a2e00;
+    white-space: nowrap;
+  }
+  #install-btn {
+    font-family: 'Caveat', cursive;
+    font-size: 16px;
+    font-weight: 600;
+    background: #f97316;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 5px 16px;
+    cursor: pointer;
+  }
+  #install-dismiss {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: rgba(100,80,0,0.5);
+    padding: 2px;
+    line-height: 1;
+  }
+  #flying-sticky {
+    position: fixed;
+    width: 60px; height: 56px;
+    background: #fef08a;
+    border-radius: 2px;
+    pointer-events: none;
+    display: none;
+    z-index: 30;
+  }
+  #flying-sticky::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 10px;
+    background: #fde047;
+  }
+  .particle { position: fixed; border-radius: 50%; pointer-events: none; }
+  .shred { position: fixed; pointer-events: none; border-radius: 2px; }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div id="bg-overlay"></div>
+<div id="canvas-layer"></div>
+<div id="flying-sticky"></div>
 
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
-  self.skipWaiting();
+<div id="scene">
+  <div id="tagline">a meadow for your mind</div>
+  <div id="title">✦ let it go ✦</div>
+  <div id="sticky-wrap">
+    <div id="sticky">
+      <div id="sticky-top"><span id="sticky-label">today's thought</span></div>
+      <div id="sticky-body">
+        <div class="sticky-line" style="top:34px"></div>
+        <div class="sticky-line" style="top:60px"></div>
+        <div class="sticky-line" style="top:86px"></div>
+        <div class="sticky-line" style="top:112px"></div>
+        <div class="sticky-line" style="top:138px"></div>
+        <div class="sticky-line" style="top:164px"></div>
+        <div class="sticky-line" style="top:190px"></div>
+        <div class="sticky-line" style="top:216px"></div>
+        <textarea id="note-input" placeholder="write it here... the thought, the guilt, the weight."></textarea>
+      </div>
+    </div>
+  </div>
+  <div id="btn-area">
+    <button id="release-btn">🔥 Release it</button>
+    <button id="clear-btn">new note</button>
+  </div>
+  <div id="hint">write what's weighing on you</div>
+  <div id="count-display"></div>
+</div>
+
+<div id="install-banner">
+  <span>Add to your home screen?</span>
+  <button id="install-btn">Install</button>
+  <button id="install-dismiss">✕</button>
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+let deferredPrompt = null;
+const banner = document.getElementById('install-banner');
+const installBtn = document.getElementById('install-btn');
+const dismissBtn = document.getElementById('install-dismiss');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  banner.style.display = 'flex';
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
-  self.clients.claim();
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  banner.style.display = 'none';
 });
 
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
-  );
+dismissBtn.addEventListener('click', () => { banner.style.display = 'none'; });
+window.addEventListener('appinstalled', () => { banner.style.display = 'none'; });
+
+const input = document.getElementById('note-input');
+const releaseBtn = document.getElementById('release-btn');
+const clearBtn = document.getElementById('clear-btn');
+const hint = document.getElementById('hint');
+const sticky = document.getElementById('sticky');
+const canvasLayer = document.getElementById('canvas-layer');
+const flyingSticky = document.getElementById('flying-sticky');
+const countEl = document.getElementById('count-display');
+
+let releaseCount = 0;
+let animating = false;
+
+input.addEventListener('input', () => {
+  hint.textContent = input.value.trim() ? 'ready when you are' : "write what's weighing on you";
 });
+
+releaseBtn.addEventListener('click', () => {
+  if (animating) return;
+  if (!input.value.trim()) { hint.textContent = 'write something first ✦'; input.focus(); return; }
+  startRelease();
+});
+
+clearBtn.addEventListener('click', () => {
+  if (animating) return;
+  input.value = '';
+  sticky.style.transform = '';
+  sticky.style.opacity = '1';
+  hint.textContent = "write what's weighing on you";
+  input.focus();
+});
+
+function startRelease() {
+  animating = true;
+  releaseBtn.disabled = true;
+  let c = 0;
+  const iv = setInterval(() => {
+    c++;
+    const sk = (Math.random()-0.5)*8*c;
+    sticky.style.transform = `skew(${sk}deg,${(Math.random()-0.5)*4}deg) scale(${1-c*0.03},${1-c*0.02})`;
+    if (c >= 6) { clearInterval(iv); launch(); }
+  }, 60);
+}
+
+function launch() {
+  const r = sticky.getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height/2;
+  sticky.style.opacity = '0';
+  sticky.style.transform = 'scale(0.05)';
+  flyingSticky.style.cssText = `display:block;left:${cx-30}px;top:${cy-28}px;opacity:1;transform:scale(1) rotate(0deg);`;
+  const tx = cx + (Math.random()*300+120)*(Math.random()>0.5?1:-1);
+  const ty = cy - (Math.random()*220+100);
+  const t0 = performance.now();
+  function fly(now) {
+    const t = Math.min((now-t0)/650, 1);
+    const e = t<0.5 ? 2*t*t : -1+(4-2*t)*t;
+    const x = cx+(tx-cx)*e, y = cy+(ty-cy)*e - Math.sin(t*Math.PI)*80;
+    flyingSticky.style.left=(x-30)+'px'; flyingSticky.style.top=(y-28)+'px';
+    flyingSticky.style.transform=`scale(${1-t*0.5}) rotate(${t*900}deg)`;
+    if (t<1) { requestAnimationFrame(fly); } else { flyingSticky.style.display='none'; explode(x,y); }
+  }
+  requestAnimationFrame(fly);
+}
+
+function explode(cx, cy) {
+  const colors = ['#f97316','#ef4444','#fbbf24','#fb923c','#fde047','#fef3c7','#fff','#86efac','#6ee7b7'];
+  for (let i=0; i<56; i++) {
+    const el = document.createElement('div');
+    el.className = Math.random()>0.4 ? 'particle' : 'shred';
+    const sz = Math.random()*12+4;
+    el.style.cssText = `left:${cx}px;top:${cy}px;width:${sz}px;height:${el.className==='particle'?sz:sz*0.35}px;background:${colors[Math.floor(Math.random()*colors.length)]};opacity:1;transform:translate(-50%,-50%) rotate(${Math.random()*360}deg);`;
+    canvasLayer.appendChild(el);
+    const angle = (i/56)*Math.PI*2+(Math.random()-0.5)*0.7;
+    const spd = Math.random()*220+80;
+    const vx=Math.cos(angle)*spd, vy=Math.sin(angle)*spd-Math.random()*100;
+    const grav=Math.random()*250+150, rs=(Math.random()-0.5)*900;
+    const life=Math.random()*700+500, t0=performance.now();
+    (function(el,vx,vy,grav,rs,life,t0){
+      function f(now){
+        const t=(now-t0)/1000;
+        if(t*1000>life){el.remove();return;}
+        el.style.left=(cx+vx*t)+'px'; el.style.top=(cy+vy*t+0.5*grav*t*t)+'px';
+        el.style.opacity=Math.max(0,1-t*1000/life);
+        el.style.transform=`translate(-50%,-50%) rotate(${rs*t}deg)`;
+        requestAnimationFrame(f);
+      }
+      requestAnimationFrame(f);
+    })(el,vx,vy,grav,rs,life,t0);
+  }
+  const fl=document.createElement('div');
+  fl.style.cssText=`position:fixed;left:${cx-70}px;top:${cy-70}px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(255,210,60,0.92) 0%,rgba(255,130,0,0.55) 40%,transparent 70%);pointer-events:none;z-index:25;transition:opacity 0.3s;`;
+  canvasLayer.appendChild(fl);
+  setTimeout(()=>{fl.style.opacity='0';setTimeout(()=>fl.remove(),300);},80);
+  releaseCount++;
+  countEl.textContent = releaseCount===1 ? '✦ 1 thought released into the meadow ✦' : `✦ ${releaseCount} thoughts released into the meadow ✦`;
+  setTimeout(()=>{
+    input.value='';
+    sticky.style.transition='opacity 0.6s,transform 0.6s';
+    sticky.style.opacity='1'; sticky.style.transform='';
+    hint.textContent='lighter now ✦';
+    releaseBtn.disabled=false; animating=false;
+    setTimeout(()=>{hint.textContent="write what's weighing on you"; sticky.style.transition='';},2500);
+  },750);
+}
+</script>
+</body>
+</html>
