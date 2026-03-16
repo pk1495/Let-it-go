@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Let It Go ✦</title>
 <meta name="description" content="A meadow for your mind — release what weighs on you.">
-<meta name="theme-color" content="#4a7c3f">
+<meta name="theme-color" content="#2d5a27">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Let It Go">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon-512.png">
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Lora:ital@0;1&display=swap" rel="stylesheet">
 <style>
@@ -28,7 +28,7 @@
   #bg {
     position: fixed;
     inset: 0;
-    background-image: url('icon.png');
+    background-image: url('icon-512.png');
     background-size: cover;
     background-position: center 30%;
     filter: brightness(0.88) saturate(1.15);
@@ -37,7 +37,7 @@
   #bg-overlay {
     position: fixed;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(20,10,5,0.08) 0%, rgba(0,0,0,0.05) 50%, rgba(20,35,5,0.25) 100%);
+    background: linear-gradient(to bottom, rgba(20,10,5,0.15) 0%, rgba(0,0,0,0.05) 50%, rgba(20,35,5,0.3) 100%);
     z-index: 1;
   }
   #canvas-layer {
@@ -53,16 +53,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0;
-    padding: 1rem;
+    width: 100%;
+    padding: env(safe-area-inset-top, 12px) 1rem env(safe-area-inset-bottom, 12px);
   }
   #tagline {
     font-family: 'Lora', serif;
     font-style: italic;
-    font-size: 15px;
+    font-size: clamp(11px, 3vw, 15px);
     color: rgba(255,255,240,0.82);
     letter-spacing: 0.08em;
-    margin-bottom: 18px;
+    margin-bottom: clamp(8px, 2vw, 18px);
     text-shadow: 0 1px 8px rgba(0,0,0,0.5);
     animation: fadeUp 1.2s ease both;
   }
@@ -73,20 +73,23 @@
   #title {
     font-family: 'Caveat', cursive;
     font-weight: 700;
-    font-size: 46px;
+    font-size: clamp(30px, 8vw, 46px);
     color: #fff8e8;
     text-shadow: 0 2px 16px rgba(0,0,0,0.45), 0 0 40px rgba(255,200,100,0.2);
     letter-spacing: 0.04em;
-    margin-bottom: 24px;
+    margin-bottom: clamp(12px, 3vw, 24px);
     animation: fadeUp 1s ease 0.1s both;
   }
   #sticky-wrap {
     animation: fadeUp 1s ease 0.25s both;
     filter: drop-shadow(0 8px 32px rgba(0,0,0,0.35)) drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
   #sticky {
-    width: 320px;
-    height: 300px;
+    width: min(320px, 88vw);
+    height: clamp(200px, 42vh, 300px);
     background: #fef08a;
     position: relative;
     border-radius: 2px;
@@ -99,12 +102,12 @@
     content: '';
     position: absolute;
     bottom: 0; right: 0;
-    width: 28px; height: 28px;
+    width: 24px; height: 24px;
     background: linear-gradient(225deg, #d4b800 50%, #fef08a 50%);
   }
   #sticky-top {
     width: 100%;
-    height: 32px;
+    height: 30px;
     background: #fde047;
     flex-shrink: 0;
     border-radius: 2px 2px 0 0;
@@ -114,7 +117,7 @@
   }
   #sticky-label {
     font-family: 'Caveat', cursive;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: rgba(100,75,0,0.55);
     letter-spacing: 0.1em;
@@ -123,7 +126,6 @@
   #sticky-body {
     flex: 1;
     position: relative;
-    padding: 10px 14px 20px 14px;
     overflow: hidden;
   }
   .sticky-line {
@@ -131,22 +133,24 @@
     left: 14px; right: 14px;
     height: 1px;
     background: rgba(160,130,0,0.18);
+    pointer-events: none;
   }
   #note-input {
     position: absolute;
-    inset: 8px 14px 18px 14px;
+    inset: 8px 14px 14px 14px;
     background: transparent;
     border: none;
     outline: none;
     resize: none;
     font-family: 'Caveat', cursive;
-    font-size: 19px;
+    font-size: clamp(16px, 4.5vw, 19px);
     font-weight: 400;
     color: #3a2e00;
     line-height: 26px;
     padding: 0;
     z-index: 2;
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
   }
   #note-input::placeholder {
     color: rgba(120,95,0,0.32);
@@ -156,25 +160,27 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    margin-top: 18px;
+    gap: 8px;
+    margin-top: clamp(10px, 2.5vw, 18px);
     animation: fadeUp 1s ease 0.4s both;
   }
   #release-btn {
     font-family: 'Caveat', cursive;
-    font-size: 22px;
+    font-size: clamp(17px, 5vw, 22px);
     font-weight: 700;
     background: linear-gradient(135deg, #f97316, #ea580c);
     color: #fff;
     border: none;
     border-radius: 40px;
-    padding: 11px 38px;
+    padding: clamp(8px, 2vw, 11px) clamp(26px, 8vw, 38px);
     cursor: pointer;
     letter-spacing: 0.04em;
     box-shadow: 0 4px 20px rgba(249,115,22,0.5), 0 1px 4px rgba(0,0,0,0.2);
     transition: transform 0.15s, box-shadow 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-  #release-btn:hover { transform: scale(1.05) translateY(-1px); box-shadow: 0 6px 28px rgba(249,115,22,0.6); }
+  #release-btn:hover { transform: scale(1.05) translateY(-1px); }
   #release-btn:active { transform: scale(0.97); }
   #release-btn:disabled { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
   #clear-btn {
@@ -186,39 +192,38 @@
     border: none;
     cursor: pointer;
     padding: 4px 8px;
-    transition: color 0.15s;
     text-shadow: 0 1px 6px rgba(0,0,0,0.4);
     text-decoration: underline;
     text-decoration-color: rgba(255,255,240,0.3);
     text-underline-offset: 3px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-  #clear-btn:hover { color: rgba(255,255,240,0.95); }
   #hint {
     font-family: 'Lora', serif;
     font-style: italic;
-    font-size: 13px;
+    font-size: clamp(11px, 3vw, 13px);
     color: rgba(255,255,230,0.65);
-    margin-top: 8px;
-    min-height: 20px;
+    margin-top: 6px;
+    min-height: 18px;
     text-align: center;
     text-shadow: 0 1px 6px rgba(0,0,0,0.5);
-    transition: opacity 0.4s;
     animation: fadeUp 1s ease 0.5s both;
   }
   #count-display {
     font-family: 'Caveat', cursive;
-    font-size: 16px;
+    font-size: clamp(12px, 3.5vw, 16px);
     color: rgba(255,255,220,0.6);
     text-shadow: 0 1px 6px rgba(0,0,0,0.4);
-    margin-top: 6px;
-    min-height: 22px;
+    margin-top: 5px;
+    min-height: 20px;
     letter-spacing: 0.05em;
-    animation: fadeUp 1s ease 0.6s both;
     text-align: center;
+    animation: fadeUp 1s ease 0.6s both;
   }
   #install-banner {
     position: fixed;
-    bottom: 24px;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     left: 50%;
     transform: translateX(-50%);
     background: rgba(255,248,220,0.92);
@@ -248,13 +253,8 @@
     cursor: pointer;
   }
   #install-dismiss {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    color: rgba(100,80,0,0.5);
-    padding: 2px;
-    line-height: 1;
+    background: none; border: none; cursor: pointer;
+    font-size: 16px; color: rgba(100,80,0,0.5); padding: 2px; line-height: 1;
   }
   #flying-sticky {
     position: fixed;
@@ -289,15 +289,14 @@
     <div id="sticky">
       <div id="sticky-top"><span id="sticky-label">today's thought</span></div>
       <div id="sticky-body">
-        <div class="sticky-line" style="top:34px"></div>
-        <div class="sticky-line" style="top:60px"></div>
-        <div class="sticky-line" style="top:86px"></div>
-        <div class="sticky-line" style="top:112px"></div>
-        <div class="sticky-line" style="top:138px"></div>
-        <div class="sticky-line" style="top:164px"></div>
-        <div class="sticky-line" style="top:190px"></div>
-        <div class="sticky-line" style="top:216px"></div>
-        <textarea id="note-input" placeholder="write it here... the thought, the guilt, the weight."></textarea>
+        <div class="sticky-line" style="top:32px"></div>
+        <div class="sticky-line" style="top:58px"></div>
+        <div class="sticky-line" style="top:84px"></div>
+        <div class="sticky-line" style="top:110px"></div>
+        <div class="sticky-line" style="top:136px"></div>
+        <div class="sticky-line" style="top:162px"></div>
+        <div class="sticky-line" style="top:188px"></div>
+        <textarea id="note-input" placeholder="write it here..."></textarea>
       </div>
     </div>
   </div>
@@ -330,7 +329,6 @@ window.addEventListener('beforeinstallprompt', e => {
   deferredPrompt = e;
   banner.style.display = 'flex';
 });
-
 installBtn.addEventListener('click', async () => {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
@@ -338,7 +336,6 @@ installBtn.addEventListener('click', async () => {
   deferredPrompt = null;
   banner.style.display = 'none';
 });
-
 dismissBtn.addEventListener('click', () => { banner.style.display = 'none'; });
 window.addEventListener('appinstalled', () => { banner.style.display = 'none'; });
 
@@ -391,13 +388,13 @@ function launch() {
   sticky.style.opacity = '0';
   sticky.style.transform = 'scale(0.05)';
   flyingSticky.style.cssText = `display:block;left:${cx-30}px;top:${cy-28}px;opacity:1;transform:scale(1) rotate(0deg);`;
-  const tx = cx + (Math.random()*300+120)*(Math.random()>0.5?1:-1);
-  const ty = cy - (Math.random()*220+100);
+  const tx = cx + (Math.random()*180+60)*(Math.random()>0.5?1:-1);
+  const ty = cy - (Math.random()*160+70);
   const t0 = performance.now();
   function fly(now) {
-    const t = Math.min((now-t0)/650, 1);
+    const t = Math.min((now-t0)/600, 1);
     const e = t<0.5 ? 2*t*t : -1+(4-2*t)*t;
-    const x = cx+(tx-cx)*e, y = cy+(ty-cy)*e - Math.sin(t*Math.PI)*80;
+    const x = cx+(tx-cx)*e, y = cy+(ty-cy)*e - Math.sin(t*Math.PI)*50;
     flyingSticky.style.left=(x-30)+'px'; flyingSticky.style.top=(y-28)+'px';
     flyingSticky.style.transform=`scale(${1-t*0.5}) rotate(${t*900}deg)`;
     if (t<1) { requestAnimationFrame(fly); } else { flyingSticky.style.display='none'; explode(x,y); }
@@ -407,17 +404,17 @@ function launch() {
 
 function explode(cx, cy) {
   const colors = ['#f97316','#ef4444','#fbbf24','#fb923c','#fde047','#fef3c7','#fff','#86efac','#6ee7b7'];
-  for (let i=0; i<56; i++) {
+  for (let i=0; i<44; i++) {
     const el = document.createElement('div');
     el.className = Math.random()>0.4 ? 'particle' : 'shred';
-    const sz = Math.random()*12+4;
+    const sz = Math.random()*10+3;
     el.style.cssText = `left:${cx}px;top:${cy}px;width:${sz}px;height:${el.className==='particle'?sz:sz*0.35}px;background:${colors[Math.floor(Math.random()*colors.length)]};opacity:1;transform:translate(-50%,-50%) rotate(${Math.random()*360}deg);`;
     canvasLayer.appendChild(el);
-    const angle = (i/56)*Math.PI*2+(Math.random()-0.5)*0.7;
-    const spd = Math.random()*220+80;
-    const vx=Math.cos(angle)*spd, vy=Math.sin(angle)*spd-Math.random()*100;
-    const grav=Math.random()*250+150, rs=(Math.random()-0.5)*900;
-    const life=Math.random()*700+500, t0=performance.now();
+    const angle = (i/44)*Math.PI*2+(Math.random()-0.5)*0.7;
+    const spd = Math.random()*160+50;
+    const vx=Math.cos(angle)*spd, vy=Math.sin(angle)*spd-Math.random()*70;
+    const grav=Math.random()*200+100, rs=(Math.random()-0.5)*800;
+    const life=Math.random()*600+400, t0=performance.now();
     (function(el,vx,vy,grav,rs,life,t0){
       function f(now){
         const t=(now-t0)/1000;
@@ -431,11 +428,13 @@ function explode(cx, cy) {
     })(el,vx,vy,grav,rs,life,t0);
   }
   const fl=document.createElement('div');
-  fl.style.cssText=`position:fixed;left:${cx-70}px;top:${cy-70}px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(255,210,60,0.92) 0%,rgba(255,130,0,0.55) 40%,transparent 70%);pointer-events:none;z-index:25;transition:opacity 0.3s;`;
+  fl.style.cssText=`position:fixed;left:${cx-55}px;top:${cy-55}px;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(255,210,60,0.92) 0%,rgba(255,130,0,0.55) 40%,transparent 70%);pointer-events:none;z-index:25;transition:opacity 0.3s;`;
   canvasLayer.appendChild(fl);
   setTimeout(()=>{fl.style.opacity='0';setTimeout(()=>fl.remove(),300);},80);
+
   releaseCount++;
   countEl.textContent = releaseCount===1 ? '✦ 1 thought released into the meadow ✦' : `✦ ${releaseCount} thoughts released into the meadow ✦`;
+
   setTimeout(()=>{
     input.value='';
     sticky.style.transition='opacity 0.6s,transform 0.6s';
